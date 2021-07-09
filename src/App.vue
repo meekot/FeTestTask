@@ -1,28 +1,44 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="container">
+      <div class="row my-4">
+        <div class="col-6">
+          <h3>Product List</h3>
+        </div>
+        <div class="col-6">
+          <button 
+            type="button" 
+            class="btn btn-primary float-right"
+          >
+          Add new product
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <product-data-table />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import productStore from './productStore'
 
+import ProductDataTable from './components/ProductDataTable.vue'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    ProductDataTable
+  },
+  created () {
+    productStore.loadProductList()
+    .catch((e) => {
+      this.$showBsToastError("Products have not been loaded.")
+      throw new Error(e)
+    })
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
