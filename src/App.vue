@@ -9,6 +9,7 @@
           <button 
             type="button" 
             class="btn btn-primary float-right"
+            @click="openProductModalForm"
           >
           Add new product
           </button>
@@ -20,16 +21,24 @@
         </div>
       </div>
     </div>
+    <product-modal-form ref="productModalForm" />
   </div>
 </template>
 <script>
 import productStore from './productStore'
 
 import ProductDataTable from './components/ProductDataTable.vue'
+import ProductModalForm from './components/ProductModalForm.vue'
 export default {
   name: 'App',
   components: {
-    ProductDataTable
+    ProductDataTable,
+    ProductModalForm
+  },
+  methods: {
+    openProductModalForm () {
+      this.$refs.productModalForm.show()
+    }
   },
   created () {
     productStore.loadProductList()
