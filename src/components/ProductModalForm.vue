@@ -3,6 +3,7 @@
     :id="modalId" 
     size="lg" 
     title="Add new product"
+    ok-title="Create"
     @hidden="reset"
     @ok="saveProduct"
   >
