@@ -14,6 +14,9 @@ const store = new Vue({
       const productList = await fetchProductList()
       this.productList = productList
       this.ready = true
+    },
+    getLastProductId() {
+      return this.productList[this.productList.length-1].id
     }
   }
 })

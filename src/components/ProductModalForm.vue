@@ -111,32 +111,9 @@
           class="form-control" 
         >
       </app-form-group-row>
-      <div class="form-group">
-        <label>Include type:</label>
-        <app-dual-list-box
-          v-if="ready"
-          :list="productListToInclude"
-          :listSelected="productListIncluded"
-          :elementKeyName="'id'"
-          :optionLabelFn="(product) => product.name + ' ('+ product.sku +')' "
-          :filterFn="(product, filterRegexp) => product.name.search(filterRegexp) !== -1 || product.sku.search(filterRegexp) !== -1"
-          @add="addIncludedProducts"
-          @remove="removeIncludedProducts"
-        />
-      </div>
-      <div class="form-group">
-        <label>Pass type:</label>
-        <app-dual-list-box
-          v-if="ready"
-          :list="productListToInclude"
-          :listSelected="productListPassed"
-          :elementKeyName="'id'"
-          :optionLabelFn="(product) => product.name + ' ('+ product.sku +')' "
-          :filterFn="(product, filterRegexp) => product.name.search(filterRegexp) !== -1 || product.sku.search(filterRegexp) !== -1"
-          @add="addPassedProducts"
-          @remove="removeIncludedProducts"
-        />
-      </div>
+      <product-modal-form-includes 
+        v-model="product.includes"
+      />
     </form>
   </b-modal>
 </template>
@@ -145,11 +122,13 @@
 import Vue from 'vue'
 import { ModalPlugin } from 'bootstrap-vue'
 import AppFormGroupRow from './appFormGroupRow.vue'
-import AppDualListBox from './appDualListBox.vue'
-Vue.use(ModalPlugin)
 
 import productStore from '../productStore'
+
+Vue.use(ModalPlugin)
+
 import { download } from '../utils/helpers'
+import ProductModalFormIncludes from './ProductModalFormIncludes.vue'
 
 
 const ProductModel = {
@@ -167,7 +146,7 @@ const ProductModel = {
 export default {
   components: { 
     AppFormGroupRow,
-    AppDualListBox 
+    ProductModalFormIncludes
   },
   name: 'ProductModalForm',
   data () {
@@ -186,56 +165,13 @@ export default {
       ]
     }
   },
-  computed: {
-    productList () {
-      return productStore.$data.productList
-    },
-    ready () {
-      return productStore.$data.ready
-    },
-    productListToInclude () {
-      return this.productList.filter((p) =>  !this.productListPassed.find(_p => _p.id === p.id) && !this.productListIncluded.find(_p => _p.id === p.id))
-    },
-    productListIncluded () {
-      const filtred = this.product.includes.filter(p => p.type === 'INCLUDE')
-      return filtred.map(el => this.productList.find(p => p.id === el.connectedProduct.id))
-    },
-    productListPassed () {
-      const filtred = this.product.includes.filter(p => p.type === 'PASS')
-      return filtred.map(el => this.productList.find(p => p.id === el.connectedProduct.id))
-    },
-  },
   methods: {
     show () {
       this.$bvModal.show(this.modalId)
     },
-    addIncludedProducts (productList) {
-      productList.forEach(p => {
-        this.product.includes.push({
-          type: "INCLUDE",
-          connectedProduct: {
-            ...p
-          }
-        })
-      });
-    },
-    removeIncludedProducts (productList) {
-      this.product.includes = this.product.includes
-        .filter((p) => !productList.find(_p => p.connectedProduct.id === _p.id))
-    },
-    addPassedProducts (productList) {
-      productList.forEach(p => {
-        this.product.includes.push({
-          type: "PASS",
-          connectedProduct: {
-            ...p
-          }
-        })
-      });
-    },
     saveProduct (e) {
       e.preventDefault()
-      this.product.id = this.productList[this.productList.length-1].id + 1
+      this.product.id = productStore.getLastProductId()  + 1
       console.log("ok", this.product)
       download(JSON.stringify(this.product), 'newProduct.txt', 'text/plain')
 

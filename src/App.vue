@@ -11,7 +11,7 @@
             class="btn btn-primary float-right"
             @click="openProductModalForm"
           >
-          Add new product
+          Create a product
           </button>
         </div>
       </div>
